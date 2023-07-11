@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/security?serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+
+
+#mybatis:
+#  mapper-locations: classpath:/com/yr/springbootsecuritymybatiscrud/mapper/UserMapper/**.xml  #指定mapper的xml
+#  type-aliases-package: com.yr.springbootsecuritymybatiscrud.entity   #指定实体类，可使用别名
+
+
+#jsp
+#  mvc:
+#    view:
+#      prefix: /WEB-INF/jsp/
+#      suffix: .jsp
+
+#freemarker
+  freemarker:
+    template-loader-path: classpath:/templates
+    cache: false
+    charset: utf-8
+    check-template-location: true
+    content-type: text/html
+    expose-request-attributes: true
+    expose-session-attributes: true
+    request-context-attribute: request
+    suffix: .ftl

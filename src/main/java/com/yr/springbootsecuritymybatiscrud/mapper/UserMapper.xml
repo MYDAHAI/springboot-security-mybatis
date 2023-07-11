@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yr.springbootsecuritymybatiscrud.mapper.UserMapper">
+
+    <resultMap type="com.yr.springbootsecuritymybatiscrud.entity.UUser" id="userResult">
+        <result column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="create_time" property="createTime"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <resultMap type="com.yr.springbootsecuritymybatiscrud.entity.UPermission" id="permissionResult">
+        <result column="id" property="id"/>
+        <result column="url" property="url"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="mark" property="mark"/>
+    </resultMap>
+
+    <resultMap type="com.yr.springbootsecuritymybatiscrud.entity.URole" id="roleResult">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+    <resultMap type="com.yr.springbootsecuritymybatiscrud.entity.UUserRole" id="userRoleResult">
+        <result column="uid" property="uid"/>
+        <result column="rid" property="rid"/>
+    </resultMap>
+
+
+    <!--查询所有用户-->
+    <select id="getUserAll" resultMap="userResult">
+        select * from u_user
+    </select>
+
+    <!--根据名字查询单个用户信息-->
+    <select id="getUserName" resultMap="userResult">
+        select * from u_user where username = #{username}
+    </select>
+
+    <!--根据id查询单个用户信息-->
+    <select id="getUserId" resultMap="userResult">
+        select * from u_user where id = #{id}
+    </select>
+
+    <!--根据名字查询所拥有的权限-->
+    <select id="getUserPermission" resultMap="permissionResult">
+        select DISTINCT p.*
+        from u_user u,u_user_role ur,u_role r,u_permission p,u_role_permission rp
+        where u.id = ur.uid and ur.rid = rp.rid and rp.pid =p.id and u.username = #{username}
+    </select>
+
+    <!--查询所有角色-->
+    <select id="getRoleAll" resultMap="roleResult">
+        select * from u_role
+    </select>
+
+    <!--查询用户是否有角色-->
+    <select id="getUUserRoleId" parameterType="Integer" resultMap="userRoleResult">
+        select * from u_user_role where uid = #{uId}
+    </select>
+
+    <!--根据url与请求类型得到请求的访问权限mark-->
+    <select id="getPermissionByUrlMethod" resultType="String">
+        select mark
+        from u_permission
+        where url = #{url} and type = #{method}
+    </select>
+
+    <!--查询所有权限-->
+    <select id="getPermissionAll" resultMap="permissionResult">
+        select * from u_permission
+    </select>
+
+    <!--查询角色是否有权限-->
+    <select id="getRolePermission" parameterType="Integer" resultType="Integer">
+        select count(rid) from u_role_permission where rid = #{rid}
+    </select>
+
+    <!--根据id查询单个角色信息-->
+    <select id="getRoleId" parameterType="Integer" resultMap="roleResult">
+        select * from u_role
+        where id = #{id}
+    </select>
+
+    <!--查出角色所拥有的权限id-->
+    <select id="getRolePermissionId" resultType="Integer" parameterType="Integer">
+        select pid
+        from u_role_permission
+        where rid = #{rid}
+    </select>
+
+    <!--添加角色-->
+    <insert id="addRole" parameterType="com.yr.springbootsecuritymybatiscrud.entity.URole"
+            useGeneratedKeys = "true" keyProperty = "id">
+        insert into u_role(name,type)
+        values(#{name},#{type})
+    </insert>
+
+    <!--添加用户-->
+    <insert id="addUser" parameterType="com.yr.springbootsecuritymybatiscrud.entity.UUser"
+            useGeneratedKeys = "true" keyProperty = "id">
+        insert into u_user(nickname,username,password,create_time,last_login_time,status)
+        values (#{nickname},#{username},#{password},#{createTime},#{lastLoginTime},1)
+    </insert>
+
+    <!--添加用户角色关联-->
+    <insert id="addUserRole" parameterType="Integer">
+        insert into u_user_role(uid,rid) values(#{userId},#{roleId})
+    </insert>
+
+    <!--添加角色与权限关联-->
+    <insert id="addRolePermission" parameterType="Integer">
+        insert into u_role_permission(rid,pid)
+        values(#{rid},#{pid})
+    </insert>
+
+    <!--修改用户信息-->
+    <update id="updateUser" parameterType="com.yr.springbootsecuritymybatiscrud.entity.UUser">
+        update u_user
+        set nickname = #{nickname},username = #{username},`password` = #{password},last_login_time = #{lastLoginTime}
+        where id = #{id}
+    </update>
+
+    <!--修改角色信息-->
+    <update id="updateRole" parameterType="com.yr.springbootsecuritymybatiscrud.entity.URole">
+        update u_role
+        set name = #{name},type =#{type}
+        where id = #{id}
+    </update>
+
+
+    <!--删除用户-->
+    <delete id="deleteUser" parameterType="Integer">
+        delete from u_user where id = #{id}
+    </delete>
+
+    <!--删除用户关联角色关系-->
+    <delete id="deleteUUserRole" parameterType="Integer">
+        delete from u_user_role where uid = #{uId}
+    </delete>
+
+    <!--删除角色-->
+    <delete id="deleteRole" parameterType="Integer">
+        delete from u_role
+        where id = #{id}
+    </delete>
+
+    <!--删除角色与权限关联-->
+    <delete id="deleteRolePermission" parameterType="Integer">
+        delete from u_role_permission where rid = #{rid}
+    </delete>
+
+</mapper>
